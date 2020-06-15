@@ -1,7 +1,9 @@
-import type { Program } from '../dsl/program'
+import { interpreterFactory } from '../dsl/interpreter'
+import { run } from '../dsl/program'
+import buildHandlers from './handlers'
+import { formatUser } from './program'
 
-async function* createUser(): Program<void> {
+const handlers = buildHandlers()
+    , interpreter = interpreterFactory(handlers)
 
-}
-
-createUser()
+run(formatUser('paul id'), interpreter).then(_ => console.log(_))
