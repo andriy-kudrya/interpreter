@@ -83,5 +83,7 @@ Seems it is quite easy to use interpreter pattern for decoupling purposes either
 
 ### Inspiration sources
 https://fsharpforfunandprofit.com/posts/13-ways-of-looking-at-a-turtle-2/#way13
+
 https://www.tweag.io/blog/2018-02-05-free-monads/
+
 https://softwareengineering.stackexchange.com/questions/242795/what-is-the-free-monad-interpreter-pattern
