@@ -69,3 +69,19 @@ async function* formatUser(userId: string): Program<string> {
 }
 ```
 Notice _emit_ thing. It is not so required in javascript we can just _yield a.getUser(userId)_ directly (but promise will be received). In typescript though there is no way to infer yield resul so _emit_ is a helper generator that facilitates type inference.
+
+## How to glue everything together
+Here are ready to use utilities _run_ and _interpreterFactory_. Nothing above is concerned with them
+```ts
+const interpreter = interpreterFactory(handlers)
+
+run(formatUser('paul id'), interpreter).then(_ => console.log(_))
+```
+
+### Conclusion
+Seems it is quite easy to use interpreter pattern for decoupling purposes either in modern javascript or typescript. Somehow it reminds me middlewares in redux but without injected _dispatch_ function.
+
+### Inspiration sources
+https://fsharpforfunandprofit.com/posts/13-ways-of-looking-at-a-turtle-2/#way13
+https://www.tweag.io/blog/2018-02-05-free-monads/
+https://softwareengineering.stackexchange.com/questions/242795/what-is-the-free-monad-interpreter-pattern
