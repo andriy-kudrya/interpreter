@@ -25,3 +25,47 @@ E.g. let look into example in this repo. While types might look intimidating at 
 }
 ```
 So high-level logic is responsible to emit a sequence of those actions, that may or may not end. And there is an interpreter that executes that logic, receiving action by action. For each action received interpreter runs appropriate handler for that action, gets result from this handler, injects it back to high-level logic and continues it's execution till next emited action or program end.
+
+## How to work with actions
+There are handy utilities and types that provide convenient means of dealing with actions and also are responsible for action related type inference, so the code is type safe in context of typescript. Each action has a type:
+```ts
+interface ActionType<Payload, Result> { ... }
+```
+_Payload_ is a parameter for action (e.g. user id) and _Result_ describes an object that will be returned when this action is interpreted
+
+It is quite cumbersome to create those action using literals so there is a handy utility that makes action creator, which in turn creates action
+```ts
+// a.action is utility that creates action creator :)
+// getUser is action creator
+const getUser = a.action<string, Promise<User>>('getUser')
+
+// and here is action
+// which in runtime is just plain object { type: 'getUser', payload: 'user id' }
+const action = getUser('user id')
+```
+## How to interpret actions
+We declare action handlers, with handler utility they are type safe as well. Utility infers type from ActionType that is mentioned earlier and was "attached" to action creator (at least typescript is made to think so)
+```ts
+const handlers: Handler<any, any>[] = [
+    handler(a.getUser, id => ajax('users', id)),
+    handler(a.validateUser, user => validateUser(user)),
+    handler(a.getCity, id => ajax('cities', id)),
+]
+```
+## How to write program
+JS generators fits there perfectly
+```ts
+async function* getStatus(user: User): Program<string> {
+    const validation = yield* emit(a.validateUser(user))
+    return validation.status
+}
+
+async function* formatUser(userId: string): Program<string> {
+    const user = yield* emit(a.getUser(userId))
+        , status = yield* getStatus(user)
+        , city = yield* emit(a.getCity(user.cityId))
+
+    return `${user.name} from ${city.name} (${status})`
+}
+```
+Notice _emit_ thing. It is not so required in javascript we can just _yield a.getUser(userId)_ directly (but promise will be received). In typescript though there is no way to infer yield resul so _emit_ is a helper generator that facilitates type inference.
